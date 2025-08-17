@@ -259,5 +259,74 @@ $router->get('/api/courses/{slug}/progress', function($slug) {
     }
 });
 
+// Cargar controlador del curso
+require_once __DIR__ . '/../app/Controllers/CourseController.php';
+
+// Ruta para vista del curso
+$router->get('/course/{slug}', function($slug) {
+    $controller = new CourseController();
+    $controller->show($slug);
+});
+
+// Ruta para API de secciones del curso
+$router->get('/api/courses/{slug}/sections', function($slug) {
+    try {
+        $courseRepo = new CourseRepository();
+        $course = $courseRepo->findBySlug($slug);
+        
+        if (!$course) {
+            JsonResponse::notFound('Curso no encontrado');
+            return;
+        }
+        
+        $controller = new CourseController();
+        $result = $controller->getSections($course['id']);
+        
+        if ($result['success']) {
+            JsonResponse::ok($result['data'], 'Secciones obtenidas correctamente');
+        } else {
+            JsonResponse::badRequest($result['error']);
+        }
+    } catch (Exception $e) {
+        JsonResponse::serverError('Error al obtener secciones: ' . $e->getMessage());
+    }
+});
+
+// Ruta para API de lecciones del curso
+$router->get('/api/courses/{slug}/lessons', function($slug) {
+    try {
+        $courseRepo = new CourseRepository();
+        $course = $courseRepo->findBySlug($slug);
+        
+        if (!$course) {
+            JsonResponse::notFound('Curso no encontrado');
+            return;
+        }
+        
+        $controller = new CourseController();
+        $result = $controller->getLessons($course['id']);
+        
+        if ($result['success']) {
+            JsonResponse::ok($result['data'], 'Lecciones obtenidas correctamente');
+        } else {
+            JsonResponse::badRequest($result['error']);
+        }
+    } catch (Exception $e) {
+        JsonResponse::serverError('Error al obtener lecciones: ' . $e->getMessage());
+    }
+});
+
+// Ruta para API de una lección específica
+$router->get('/api/lessons/{id}', function($id) {
+    $controller = new CourseController();
+    $result = $controller->getLesson((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Lección obtenida correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
 // Ejecutar router
 $router->run();

@@ -43,6 +43,14 @@ class LessonRepository extends BaseRepository
     }
     
     /**
+     * Obtiene una lección por ID
+     */
+    public function findById(int $id): ?array
+    {
+        return $this->find($id);
+    }
+    
+    /**
      * Actualiza la duración de una lección
      */
     public function updateDuration(int $id, float $durationSeconds): bool
