@@ -4,6 +4,9 @@ console.log('🚀 CursoMy LMS Lite iniciando...');
 // Importar módulos del dashboard
 import { Dashboard } from './dashboard/index.js';
 
+// Importar módulo de valoraciones
+import './ratings/index.js';
+
 // Funcionalidad global
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM cargado, inicializando aplicación...');

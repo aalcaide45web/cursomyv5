@@ -453,5 +453,90 @@ $router->post('/api/lessons/{id}/progress', function($id) {
     }
 });
 
+// Rutas para valoraciones
+$router->get('/api/courses/{id}/rating', function($id) {
+    $controller = new RatingController();
+    $result = $controller->getUserRating((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Valoración obtenida correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/courses/{id}/rating/stats', function($id) {
+    $controller = new RatingController();
+    $result = $controller->getCourseRatingStats((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Estadísticas obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->post('/api/courses/{id}/rating', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $rating = $input['rating'] ?? 0;
+    
+    $controller = new RatingController();
+    $result = $controller->rateCourse((int) $id, (int) $rating);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->delete('/api/courses/{id}/rating', function($id) {
+    $controller = new RatingController();
+    $result = $controller->removeRating((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/ratings/recent', function() {
+    $limit = $_GET['limit'] ?? 10;
+    
+    $controller = new RatingController();
+    $result = $controller->getRecentRatings((int) $limit);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Valoraciones recientes obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/ratings/stats', function() {
+    $controller = new RatingController();
+    $result = $controller->getGlobalStats();
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Estadísticas globales obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/ratings/search', function() {
+    $query = $_GET['q'] ?? '';
+    
+    $controller = new RatingController();
+    $result = $controller->searchRatings($query);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Búsqueda completada correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
 // Ejecutar router
 $router->run();

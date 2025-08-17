@@ -62,10 +62,7 @@ class CourseCard {
                 
                 <!-- Rating -->
                 <div class="flex items-center">
-                    <div class="flex text-yellow-400">
-                        {$this->renderStars($avgRating)}
-                    </div>
-                    <span class="ml-2 text-sm text-gray-300">{$rating}</span>
+                    <?php echo StarRating::display($avgRating, $lessonsCount, 'sm'); ?>
                 </div>
                 
                 <!-- Stats -->
@@ -115,13 +112,6 @@ class CourseCard {
         return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDMyMCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTI4IiBmaWxsPSIjMzM0MTU1Ii8+CjxwYXRoIGQ9Ik0xNjAgNjRMMTkyIDk2TDE2MCAxMjhMMTI4IDk2TDE2MCA2NFoiIGZpbGw9IiM2QjcyODAiLz4KPC9zdmc+';
     }
     
-    private function formatRating(float $avgRating, int $count): string {
-        if ($count === 0) {
-            return 'Sin valoraciones';
-        }
-        return number_format($avgRating, 1) . " ({$count})";
-    }
-    
     private function formatDuration(int $seconds): string {
         if ($seconds === 0) {
             return '--:--';
@@ -134,31 +124,6 @@ class CourseCard {
             return sprintf('%d:%02d', $hours, $minutes);
         }
         return sprintf('%d:%02d', $minutes, $seconds % 60);
-    }
-    
-    private function renderStars(float $rating): string {
-        $fullStars = intval($rating);
-        $hasHalfStar = ($rating - $fullStars) >= 0.5;
-        $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
-        
-        $stars = '';
-        
-        // Estrellas llenas
-        for ($i = 0; $i < $fullStars; $i++) {
-            $stars .= '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
-        }
-        
-        // Media estrella
-        if ($hasHalfStar) {
-            $stars .= '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
-        }
-        
-        // Estrellas vacías
-        for ($i = 0; $i < $emptyStars; $i++) {
-            $stars .= '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81H4.82c.969 0 1.371 1.24.588 1.81l3.976 2.888z"/></svg>';
-        }
-        
-        return $stars;
     }
     
     private function escape(string $text): string {
