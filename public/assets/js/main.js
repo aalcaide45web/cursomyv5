@@ -106,14 +106,33 @@ async function startScan(type) {
         
         const result = await response.json();
         
-        if (result.status === 'not_implemented') {
-            updateScanStatus('Funcionalidad pendiente de implementación en FASE 2');
-            updateScanPercentage(100);
-            addScanLog('⚠️ Esta funcionalidad se implementará en la FASE 2');
-        } else {
-            updateScanStatus('Escaneo completado');
+        if (result.status === 'success') {
+            updateScanStatus('Escaneo completado exitosamente');
             updateScanPercentage(100);
             addScanLog('✅ Escaneo completado exitosamente');
+            
+            // Mostrar estadísticas del resultado
+            if (result.data && result.data.result) {
+                const scanResult = result.data.result;
+                addScanLog(`📊 Archivos procesados: ${scanResult.stats.files_processed}`);
+                addScanLog(`📝 Archivos importados: ${scanResult.stats.files_imported}`);
+                addScanLog(`🎯 Lecciones creadas: ${scanResult.stats.lessons_created}`);
+                addScanLog(`🔄 Lecciones actualizadas: ${scanResult.stats.lessons_updated}`);
+                addScanLog(`🎬 Media procesado: ${scanResult.stats.media_processed}`);
+                
+                if (scanResult.stats.errors > 0) {
+                    addScanLog(`⚠️ Errores: ${scanResult.stats.errors}`);
+                }
+            }
+            
+            // Recargar estadísticas del dashboard
+            if (typeof reloadDashboardStats === 'function') {
+                reloadDashboardStats();
+            }
+            
+        } else {
+            updateScanStatus('Error en el escaneo');
+            addScanLog(`❌ Error: ${result.message}`);
         }
         
     } catch (error) {

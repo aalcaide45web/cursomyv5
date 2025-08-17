@@ -57,16 +57,95 @@ $router->get('/api/dashboard/stats', function() {
     }
 });
 
+// Cargar clases del sistema de escaneo
+require_once __DIR__ . '/../app/Services/Scanner/FilesystemScanner.php';
+require_once __DIR__ . '/../app/Services/Scanner/Hasher.php';
+require_once __DIR__ . '/../app/Services/Media/MediaProbe.php';
+require_once __DIR__ . '/../app/Services/Scanner/Importer.php';
+require_once __DIR__ . '/../app/Controllers/ScanController.php';
+
 // Ruta para API de escaneo incremental
 $router->post('/api/scan/incremental', function() {
-    // TODO: Implementar en FASE 2
-    JsonResponse::error('Funcionalidad pendiente de implementación en FASE 2', 501);
+    $controller = new ScanController();
+    $controller->incremental();
 });
 
 // Ruta para API de escaneo rebuild
 $router->post('/api/scan/rebuild', function() {
-    // TODO: Implementar en FASE 2
-    JsonResponse::error('Funcionalidad pendiente de implementación en FASE 2', 501);
+    $controller = new ScanController();
+    $controller->rebuild();
+});
+
+// Ruta para API de información del sistema de escaneo
+$router->get('/api/scan/system-info', function() {
+    $controller = new ScanController();
+    $controller->systemInfo();
+});
+
+// Ruta para API de estadísticas de escaneo
+$router->get('/api/scan/stats', function() {
+    $controller = new ScanController();
+    $controller->scanStats();
+});
+
+// Ruta para API de estadísticas de hash
+$router->get('/api/scan/hash-stats', function() {
+    $controller = new ScanController();
+    $controller->hashStats();
+});
+
+// Ruta para API de información de ffmpeg
+$router->get('/api/scan/ffmpeg-info', function() {
+    $controller = new ScanController();
+    $controller->ffmpegInfo();
+});
+
+// Ruta para API de limpieza de hashes
+$router->post('/api/scan/clean-hashes', function() {
+    $controller = new ScanController();
+    $controller->cleanHashes();
+});
+
+// Ruta para API de escaneo solo (diagnóstico)
+$router->get('/api/scan/scan-only', function() {
+    $controller = new ScanController();
+    $controller->scanOnly();
+});
+
+// Ruta para API de archivos por topic
+$router->get('/api/scan/files-by-topic/{topic}', function($topic) {
+    $controller = new ScanController();
+    $controller->filesByTopic($topic);
+});
+
+// Ruta para API de archivos por instructor
+$router->get('/api/scan/files-by-instructor/{instructor}', function($instructor) {
+    $controller = new ScanController();
+    $controller->filesByInstructor($instructor);
+});
+
+// Ruta para API de archivos por curso
+$router->get('/api/scan/files-by-course/{course}', function($course) {
+    $controller = new ScanController();
+    $controller->filesByCourse($course);
+});
+
+// Ruta para API de archivos modificados
+$router->get('/api/scan/modified-files/{timestamp}', function($timestamp) {
+    $controller = new ScanController();
+    $controller->modifiedFiles((int) $timestamp);
+});
+
+// Ruta para API de archivos por tamaño
+$router->get('/api/scan/files-by-size/{minSize}', function($minSize) {
+    $controller = new ScanController();
+    $controller->filesBySize((int) $minSize);
+});
+
+// Ruta para API de búsqueda de duplicados
+$router->get('/api/scan/find-duplicates', function() {
+    $controller = new ScanController();
+    $controller->findDuplicates();
 });
 
 // Ruta para API de cursos
