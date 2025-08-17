@@ -1,19 +1,6 @@
 <?php
-// Cargar configuración
-$config = require __DIR__ . '/../../config/env.example.php';
-
-// Cargar clases necesarias
-require_once __DIR__ . '/../../app/Services/DB.php';
-require_once __DIR__ . '/../../app/Repositories/BaseRepository.php';
-require_once __DIR__ . '/../../app/Repositories/CourseRepository.php';
-require_once __DIR__ . '/../../app/Views/components/CourseCard.php';
-
-// Configurar base de datos
-DB::setDbPath($config['DB_PATH']);
-
-// Obtener cursos activos
-$courseRepository = new CourseRepository();
-$courses = $courseRepository->getAllActive();
+// El dashboard solo debe contener la lógica de presentación
+// La configuración y clases se cargan en index.php
 ?>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -107,26 +94,26 @@ $courses = $courseRepository->getAllActive();
         <h2 class="text-2xl font-semibold text-white mb-6">Mis Cursos</h2>
         
         <?php if (empty($courses)): ?>
-            <div id="no-courses" class="text-center py-12">
+            <!-- Mensaje cuando no hay cursos -->
+            <div class="text-center py-12">
                 <div class="text-gray-400 text-lg mb-4">
                     <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                     </svg>
-                    No hay cursos disponibles
+                    No tienes cursos disponibles
                 </div>
-                <p class="text-gray-500 mb-6">
-                    Ejecuta un escaneo para importar tus cursos desde la carpeta de uploads
-                </p>
+                <p class="text-gray-500 mb-6">Comienza haciendo un escaneo de tu directorio de uploads</p>
                 <button id="first-scan" 
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
-                    Realizar Primer Escaneo
+                    Primer Escaneo
                 </button>
             </div>
         <?php else: ?>
-            <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Grid de tarjetas de cursos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 <?php foreach ($courses as $course): ?>
                     <?php
-                    $courseCard = new CourseCard($course, $config['UPLOADS_PATH']);
+                    $courseCard = new CourseCard($course, $config['UPLOADS_PATH'] ?? 'uploads');
                     echo $courseCard->render();
                     ?>
                 <?php endforeach; ?>
@@ -135,20 +122,21 @@ $courses = $courseRepository->getAllActive();
     </div>
 </div>
 
-<!-- Modal de Estadísticas del Escaneo -->
+<!-- Modal de Estadísticas de Escaneo -->
 <div id="scan-stats-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 border border-gray-600 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-white">Estadísticas del Escaneo</h3>
-                <button id="close-scan-stats" class="text-gray-400 hover:text-white">
+                <h3 class="text-xl font-semibold text-white">Estadísticas de Escaneo</h3>
+                <button onclick="closeScanStatsModal()" class="text-gray-400 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <div id="scan-stats-content" class="text-gray-300">
-                Cargando estadísticas...
+            
+            <div id="scan-stats-content" class="space-y-4">
+                <!-- El contenido se carga dinámicamente -->
             </div>
         </div>
     </div>
