@@ -548,6 +548,9 @@ require_once __DIR__ . '/../app/Views/components/SearchBox.php';
 require_once __DIR__ . '/../app/Views/components/StarRating.php';
 require_once __DIR__ . '/../app/Views/components/CourseCard.php';
 require_once __DIR__ . '/../app/Views/components/VideoPlayer.php';
+require_once __DIR__ . '/../app/Views/components/Toast.php';
+require_once __DIR__ . '/../app/Views/components/ConfirmModal.php';
+require_once __DIR__ . '/../app/Views/components/ThemeToggle.php';
 
 // Rutas para búsqueda global
 $router->get('/api/search', function() {

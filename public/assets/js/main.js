@@ -10,6 +10,12 @@ import './ratings/index.js';
 // Importar módulo de búsqueda global
 import './search/index.js';
 
+// Importar módulos de extras y pulido
+import './toast/index.js';
+import './modal/index.js';
+import './shortcuts/index.js';
+import './theme/index.js';
+
 // Funcionalidad global
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM cargado, inicializando aplicación...');

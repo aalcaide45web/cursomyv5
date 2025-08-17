@@ -47,6 +47,11 @@
                     </svg>
                     <span>Rebuild</span>
                 </button>
+                
+                <!-- Toggle de Tema -->
+                <div class="ml-4">
+                    <?php echo (new ThemeToggle())->render(); ?>
+                </div>
             </div>
         </div>
         
