@@ -10,6 +10,15 @@
         <p class="text-xl text-gray-300">Tu plataforma de aprendizaje personal</p>
     </div>
 
+    <!-- Buscador Global -->
+    <div class="max-w-4xl mx-auto mb-8">
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6">
+            <h2 class="text-xl font-semibold text-white mb-4 text-center">Buscador Global</h2>
+            <p class="text-gray-300 text-center mb-4">Busca en cursos, lecciones, instructores, notas y comentarios</p>
+            <?php echo (new SearchBox('Buscar en todo el sistema...', 'lg', true))->render(); ?>
+        </div>
+    </div>
+
     <!-- Tarjetas de Estado -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 text-center">

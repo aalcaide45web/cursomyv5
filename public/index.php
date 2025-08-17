@@ -538,5 +538,76 @@ $router->get('/api/ratings/search', function() {
     }
 });
 
+// Rutas para búsqueda global
+$router->get('/api/search', function() {
+    $query = $_GET['q'] ?? '';
+    $limit = $_GET['limit'] ?? 50;
+    
+    $controller = new SearchController();
+    $result = $controller->search($query, (int) $limit);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result, 'Búsqueda completada correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/search/suggestions', function() {
+    $query = $_GET['q'] ?? '';
+    $limit = $_GET['limit'] ?? 10;
+    
+    $controller = new SearchController();
+    $result = $controller->getSuggestions($query, (int) $limit);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Sugerencias obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/search/filters', function() {
+    $query = $_GET['q'] ?? '';
+    $limit = $_GET['limit'] ?? 50;
+    $filters = $_GET['filters'] ?? [];
+    
+    // Parsear filtros JSON si vienen como string
+    if (is_string($filters)) {
+        $filters = json_decode($filters, true) ?: [];
+    }
+    
+    $controller = new SearchController();
+    $result = $controller->searchWithFilters($query, $filters, (int) $limit);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result, 'Búsqueda con filtros completada correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->post('/api/search/rebuild-index', function() {
+    $controller = new SearchController();
+    $result = $controller->rebuildIndex();
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->get('/api/search/stats', function() {
+    $controller = new SearchController();
+    $result = $controller->getStats();
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Estadísticas de búsqueda obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
 // Ejecutar router
 $router->run();
