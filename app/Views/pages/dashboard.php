@@ -1,88 +1,155 @@
-<div class="space-y-8">
-    <!-- Header del dashboard -->
-    <div class="text-center">
-        <h2 class="text-4xl font-bold text-glow mb-4">Bienvenido a CursoMy LMS</h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            Tu plataforma de aprendizaje personal. Escanea tu carpeta de cursos para comenzar a organizar y aprender.
-        </p>
+<?php
+// Cargar configuración
+$config = require __DIR__ . '/../../config/env.example.php';
+
+// Cargar clases necesarias
+require_once __DIR__ . '/../../app/Services/DB.php';
+require_once __DIR__ . '/../../app/Repositories/BaseRepository.php';
+require_once __DIR__ . '/../../app/Repositories/CourseRepository.php';
+require_once __DIR__ . '/../../app/Views/components/CourseCard.php';
+
+// Configurar base de datos
+DB::setDbPath($config['DB_PATH']);
+
+// Obtener cursos activos
+$courseRepository = new CourseRepository();
+$courses = $courseRepository->getAllActive();
+?>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <!-- Header del Dashboard -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-white mb-4">Bienvenido a CursoMy LMS</h1>
+        <p class="text-xl text-gray-300">Tu plataforma de aprendizaje personal</p>
     </div>
-    
-    <!-- Estado del sistema -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="glass rounded-xl p-6 text-center">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Cursos</h3>
-            <p id="courses-count" class="text-3xl font-bold text-blue-400">0</p>
+
+    <!-- Tarjetas de Estado -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 text-center">
+            <div class="text-3xl font-bold text-blue-400 mb-2" id="courses-count">0</div>
+            <div class="text-gray-300">Cursos</div>
         </div>
-        
-        <div class="glass rounded-xl p-6 text-center">
-            <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Lecciones</h3>
-            <p id="lessons-count" class="text-3xl font-bold text-purple-400">0</p>
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 text-center">
+            <div class="text-3xl font-bold text-green-400 mb-2" id="lessons-count">0</div>
+            <div class="text-gray-300">Lecciones</div>
         </div>
-        
-        <div class="glass rounded-xl p-6 text-center">
-            <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Horas</h3>
-            <p id="total-hours" class="text-3xl font-bold text-green-400">0h</p>
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 text-center">
+            <div class="text-3xl font-bold text-purple-400 mb-2" id="total-hours">0h</div>
+            <div class="text-gray-300">Horas de Contenido</div>
         </div>
     </div>
-    
-    <!-- Mensaje de bienvenida -->
-    <div class="glass rounded-xl p-8 text-center">
-        <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-        </div>
-        <h3 class="text-2xl font-semibold mb-4">¡Comienza ahora!</h3>
-        <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Para empezar a usar CursoMy LMS, coloca tus cursos en la carpeta <code class="bg-gray-800 px-2 py-1 rounded">/uploads</code> 
-            y luego haz clic en "Incremental" para escanear los archivos.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-                id="get-started-incremental"
-                class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 font-semibold flex items-center justify-center space-x-2"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+
+    <!-- Sección de Acciones -->
+    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-8">
+        <h2 class="text-2xl font-semibold text-white mb-4">Comenzar</h2>
+        <div class="flex flex-wrap gap-4">
+            <button id="incremental-scan" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
-                <span>Escanear Incremental</span>
+                Escaneo Incremental
             </button>
-            <button 
-                id="get-started-rebuild"
-                class="px-6 py-3 glass rounded-lg border border-glass-border hover:bg-white hover:bg-opacity-20 transition-all duration-200 font-semibold flex items-center justify-center space-x-2"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            <button id="rebuild-scan" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
-                <span>Rebuild Completo</span>
+                Reconstruir Todo
             </button>
         </div>
+        
+        <!-- Barra de Progreso -->
+        <div id="scan-progress" class="hidden mt-4">
+            <div class="bg-gray-700 rounded-full h-2 mb-2">
+                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div id="progress-text" class="text-sm text-gray-300">Preparando escaneo...</div>
+        </div>
+        
+        <!-- Logs del Escaneo -->
+        <div id="scan-logs" class="hidden mt-4 p-4 bg-black/20 rounded-lg max-h-32 overflow-y-auto">
+            <div class="text-sm text-gray-300 font-mono" id="logs-content"></div>
+        </div>
     </div>
-    
-    <!-- Grid de cursos (inicialmente vacío) -->
-    <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <!-- Las tarjetas de curso se cargarán aquí dinámicamente -->
+
+    <!-- Información del Sistema -->
+    <div id="system-info-section" class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-8">
+        <h2 class="text-2xl font-semibold text-white mb-4">Información del Sistema</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="text-center">
+                <div class="text-lg font-semibold text-gray-300 mb-2">Scanner</div>
+                <div id="scanner-status" class="text-sm">Cargando...</div>
+            </div>
+            <div class="text-center">
+                <div class="text-lg font-semibold text-gray-300 mb-2">ffmpeg</div>
+                <div id="ffmpeg-status" class="text-sm">Cargando...</div>
+            </div>
+            <div class="text-center">
+                <div class="text-lg font-semibold text-gray-300 mb-2">Cache</div>
+                <div id="cache-status" class="text-sm">Cargando...</div>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button id="refresh-system-info" 
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors">
+                Actualizar Info
+            </button>
+            <button id="view-scan-stats" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                Ver Estadísticas
+            </button>
+        </div>
     </div>
-    
-    <!-- Mensaje cuando no hay cursos -->
-    <div id="no-courses-message" class="glass rounded-xl p-8 text-center">
-        <p class="text-gray-400 text-lg">
-            No hay cursos disponibles. Escanea tu carpeta de uploads para comenzar.
-        </p>
+
+    <!-- Grid de Cursos -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-white mb-6">Mis Cursos</h2>
+        
+        <?php if (empty($courses)): ?>
+            <div id="no-courses" class="text-center py-12">
+                <div class="text-gray-400 text-lg mb-4">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    No hay cursos disponibles
+                </div>
+                <p class="text-gray-500 mb-6">
+                    Ejecuta un escaneo para importar tus cursos desde la carpeta de uploads
+                </p>
+                <button id="first-scan" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
+                    Realizar Primer Escaneo
+                </button>
+            </div>
+        <?php else: ?>
+            <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <?php foreach ($courses as $course): ?>
+                    <?php
+                    $courseCard = new CourseCard($course, $config['UPLOADS_PATH']);
+                    echo $courseCard->render();
+                    ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Modal de Estadísticas del Escaneo -->
+<div id="scan-stats-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 border border-gray-600 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-white">Estadísticas del Escaneo</h3>
+                <button id="close-scan-stats" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="scan-stats-content" class="text-gray-300">
+                Cargando estadísticas...
+            </div>
+        </div>
     </div>
 </div>

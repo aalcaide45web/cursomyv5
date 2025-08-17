@@ -7,6 +7,7 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/custom.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -26,29 +27,6 @@
             }
         }
     </script>
-    
-    <!-- Estilos personalizados para glassmorphism -->
-    <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .glass-dark {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-        }
-        
-        .text-glow {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-    </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-100">
     <!-- Topbar -->

@@ -16,6 +16,7 @@ require_once __DIR__ . '/../app/Repositories/CourseRepository.php';
 require_once __DIR__ . '/../app/Repositories/SectionRepository.php';
 require_once __DIR__ . '/../app/Repositories/LessonRepository.php';
 require_once __DIR__ . '/../app/Repositories/DashboardRepository.php';
+require_once __DIR__ . '/../app/Repositories/ProgressRepository.php';
 require_once __DIR__ . '/../app/Router.php';
 
 // Autoloader simple para futuras clases
@@ -197,6 +198,64 @@ $router->get('/api/instructors', function() {
         JsonResponse::ok($instructors, 'Instructores obtenidos correctamente');
     } catch (Exception $e) {
         JsonResponse::serverError('Error al obtener instructores: ' . $e->getMessage());
+    }
+});
+
+// Cargar controlador del dashboard
+require_once __DIR__ . '/../app/Controllers/DashboardController.php';
+
+// Ruta para API de renombrar curso
+$router->patch('/api/courses/{slug}/rename', function($slug) {
+    $controller = new DashboardController();
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    if (!isset($data['new_name'])) {
+        JsonResponse::validationError(['new_name' => 'El nombre del curso es requerido']);
+        return;
+    }
+    
+    $result = $controller->renameCourse($slug, $data['new_name']);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+// Ruta para API de eliminar curso
+$router->delete('/api/courses/{slug}', function($slug) {
+    $controller = new DashboardController();
+    $result = $controller->deleteCourse($slug);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+// Ruta para API de reactivar curso
+$router->patch('/api/courses/{slug}/reactivate', function($slug) {
+    $controller = new DashboardController();
+    $result = $controller->reactivateCourse($slug);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+// Ruta para API de progreso del curso
+$router->get('/api/courses/{slug}/progress', function($slug) {
+    $controller = new DashboardController();
+    $result = $controller->getCourseProgress($slug);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Progreso obtenido correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
     }
 });
 

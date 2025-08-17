@@ -2,7 +2,7 @@
 console.log('🚀 CursoMy LMS Lite iniciando...');
 
 // Importar módulos del dashboard
-import './dashboard/index.js';
+import { Dashboard } from './dashboard/index.js';
 
 // Funcionalidad global
 document.addEventListener('DOMContentLoaded', function() {
@@ -54,12 +54,11 @@ async function performGlobalSearch(query) {
 
 // Inicializar botones de escaneo
 function initScanButtons() {
-    const incrementalBtn = document.getElementById('scan-incremental');
-    const rebuildBtn = document.getElementById('scan-rebuild');
-    const getStartedIncremental = document.getElementById('get-started-incremental');
-    const getStartedRebuild = document.getElementById('get-started-rebuild');
+    const incrementalBtn = document.getElementById('incremental-scan');
+    const rebuildBtn = document.getElementById('rebuild-scan');
+    const firstScanBtn = document.getElementById('first-scan');
     
-    // Botones del topbar
+    // Botones del dashboard
     if (incrementalBtn) {
         incrementalBtn.addEventListener('click', () => startScan('incremental'));
     }
@@ -68,13 +67,9 @@ function initScanButtons() {
         rebuildBtn.addEventListener('click', () => startScan('rebuild'));
     }
     
-    // Botones del mensaje de bienvenida
-    if (getStartedIncremental) {
-        getStartedIncremental.addEventListener('click', () => startScan('incremental'));
-    }
-    
-    if (getStartedRebuild) {
-        getStartedRebuild.addEventListener('click', () => startScan('rebuild'));
+    // Botón del mensaje de bienvenida
+    if (firstScanBtn) {
+        firstScanBtn.addEventListener('click', () => startScan('incremental'));
     }
 }
 
@@ -106,33 +101,33 @@ async function startScan(type) {
         
         const result = await response.json();
         
-        if (result.status === 'success') {
+        if (result.success) {
             updateScanStatus('Escaneo completado exitosamente');
             updateScanPercentage(100);
             addScanLog('✅ Escaneo completado exitosamente');
             
             // Mostrar estadísticas del resultado
-            if (result.data && result.data.result) {
-                const scanResult = result.data.result;
-                addScanLog(`📊 Archivos procesados: ${scanResult.stats.files_processed}`);
-                addScanLog(`📝 Archivos importados: ${scanResult.stats.files_imported}`);
-                addScanLog(`🎯 Lecciones creadas: ${scanResult.stats.lessons_created}`);
-                addScanLog(`🔄 Lecciones actualizadas: ${scanResult.stats.lessons_updated}`);
-                addScanLog(`🎬 Media procesado: ${scanResult.stats.media_processed}`);
+            if (result.data) {
+                const scanResult = result.data;
+                addScanLog(`📊 Archivos procesados: ${scanResult.files_processed || 0}`);
+                addScanLog(`📝 Archivos importados: ${scanResult.files_imported || 0}`);
+                addScanLog(`🎯 Lecciones creadas: ${scanResult.lessons_created || 0}`);
+                addScanLog(`🔄 Lecciones actualizadas: ${scanResult.lessons_updated || 0}`);
+                addScanLog(`🎬 Media procesado: ${scanResult.media_processed || 0}`);
                 
-                if (scanResult.stats.errors > 0) {
-                    addScanLog(`⚠️ Errores: ${scanResult.stats.errors}`);
+                if (scanResult.errors && scanResult.errors.length > 0) {
+                    addScanLog(`⚠️ Errores: ${scanResult.errors.length}`);
                 }
             }
             
             // Recargar estadísticas del dashboard
-            if (typeof reloadDashboardStats === 'function') {
-                reloadDashboardStats();
+            if (window.dashboard && typeof window.dashboard.reloadDashboardStats === 'function') {
+                window.dashboard.reloadDashboardStats();
             }
             
         } else {
             updateScanStatus('Error en el escaneo');
-            addScanLog(`❌ Error: ${result.message}`);
+            addScanLog(`❌ Error: ${result.error || 'Error desconocido'}`);
         }
         
     } catch (error) {
