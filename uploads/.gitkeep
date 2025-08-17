@@ -1,0 +1,3 @@
+# Esta carpeta se usa para almacenar los cursos y lecciones
+# Estructura esperada: /uploads/{topic}/{instructor}/{course}/{section}/{lesson.(mp4|mkv|webm|mov)}
+# Se mantiene en git para preservar la estructura del proyecto
