@@ -3,16 +3,31 @@
 // Cargar configuración
 $config = require __DIR__ . '/../config/env.example.php';
 
-// Configurar ruta de base de datos
-DB::setDbPath($config['DB_PATH']);
+// Cargar clases manualmente para asegurar que funcionen
+require_once __DIR__ . '/../app/Services/DB.php';
+require_once __DIR__ . '/../app/Lib/Str.php';
+require_once __DIR__ . '/../app/Lib/Time.php';
+require_once __DIR__ . '/../app/Lib/JsonResponse.php';
+require_once __DIR__ . '/../app/Lib/Validate.php';
+require_once __DIR__ . '/../app/Repositories/BaseRepository.php';
+require_once __DIR__ . '/../app/Repositories/TopicRepository.php';
+require_once __DIR__ . '/../app/Repositories/InstructorRepository.php';
+require_once __DIR__ . '/../app/Repositories/CourseRepository.php';
+require_once __DIR__ . '/../app/Repositories/SectionRepository.php';
+require_once __DIR__ . '/../app/Repositories/LessonRepository.php';
+require_once __DIR__ . '/../app/Repositories/DashboardRepository.php';
+require_once __DIR__ . '/../app/Router.php';
 
-// Autoloader simple
+// Autoloader simple para futuras clases
 spl_autoload_register(function ($class) {
     $file = __DIR__ . '/../app/' . str_replace('\\', '/', $class) . '.php';
     if (file_exists($file)) {
         require_once $file;
     }
 });
+
+// Configurar ruta de base de datos
+DB::setDbPath($config['DB_PATH']);
 
 // Crear router
 $router = new Router();
