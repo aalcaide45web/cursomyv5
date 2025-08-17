@@ -225,8 +225,8 @@ function selectLesson(lessonId, lessonName) {
     document.getElementById('lesson-info').classList.remove('hidden');
     document.getElementById('lesson-title').textContent = lessonName;
     
-    // TODO: Cargar detalles de la lección y preparar player
-    // Esto se implementará en FASE 5
+    // Cargar detalles de la lección y preparar player
+    loadLessonDetails(lessonId);
     
     // Marcar lección como activa en el sidebar
     document.querySelectorAll('.lesson-item button').forEach(btn => {
@@ -236,5 +236,210 @@ function selectLesson(lessonId, lessonName) {
     
     event.currentTarget.classList.remove('text-gray-400');
     event.currentTarget.classList.add('bg-blue-600', 'text-white');
+}
+
+// Cargar detalles de la lección
+async function loadLessonDetails(lessonId) {
+    try {
+        // Obtener información de la lección
+        const response = await fetch(`/api/lessons/${lessonId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const lesson = data.data.lesson;
+            const progress = data.data.progress;
+            
+            // Mostrar player
+            showVideoPlayer(lesson, progress);
+            
+            // Cargar notas y comentarios
+            loadNotes(lessonId);
+            loadComments(lessonId);
+        } else {
+            console.error('Error al cargar lección:', data.error);
+        }
+    } catch (error) {
+        console.error('Error al cargar lección:', error);
+    }
+}
+
+// Mostrar el reproductor de video
+function showVideoPlayer(lesson, progress) {
+    const playerArea = document.getElementById('player-area');
+    const lessonInfo = document.getElementById('lesson-info');
+    
+    // Ocultar mensaje de selección
+    playerArea.classList.remove('hidden');
+    
+    // Crear el player (esto se implementará con el componente VideoPlayer)
+    // Por ahora, mostramos un mensaje de que el player se está cargando
+    playerArea.innerHTML = `
+        <div class="text-center py-8">
+            <div class="text-blue-400 text-lg mb-4">
+                <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Cargando reproductor...
+            </div>
+            <p class="text-gray-500">Preparando video: ${lesson.name}</p>
+        </div>
+    `;
+    
+    // TODO: Integrar el componente VideoPlayer aquí
+    // Por ahora, mostramos información básica
+    lessonInfo.innerHTML = `
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-400">Duración:</span>
+                    <span class="text-white">${formatDuration(lesson.duration_seconds || 0)}</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-400">Archivo:</span>
+                    <span class="text-white font-mono text-sm">${lesson.file_path || 'N/A'}</span>
+                </div>
+            </div>
+            ${progress ? `
+                <div class="bg-blue-600/20 border border-blue-600/30 rounded-lg p-3">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-blue-400">Progreso guardado: ${formatDuration(progress.position)}</span>
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+// Cargar notas de la lección
+async function loadNotes(lessonId) {
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}/notes`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayNotes(data.data);
+        } else {
+            console.error('Error al cargar notas:', data.error);
+        }
+    } catch (error) {
+        console.error('Error al cargar notas:', error);
+    }
+}
+
+// Cargar comentarios de la lección
+async function loadComments(lessonId) {
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}/comments`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayComments(data.data);
+        } else {
+            console.error('Error al cargar comentarios:', data.error);
+        }
+    } catch (error) {
+        console.error('Error al cargar comentarios:', error);
+    }
+}
+
+// Mostrar notas en el panel
+function displayNotes(notes) {
+    const notesList = document.getElementById('notes-list');
+    if (!notesList) return;
+    
+    if (notes.length === 0) {
+        notesList.innerHTML = '<p class="text-gray-500 text-center py-4">No hay notas para esta lección</p>';
+        return;
+    }
+    
+    notesList.innerHTML = notes.map(note => `
+        <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+            <div class="flex items-center justify-between mb-2">
+                <button onclick="jumpToTime(${note.timestamp})" 
+                        class="text-blue-400 hover:text-blue-300 text-sm font-mono">
+                    ${formatDuration(note.timestamp)}
+                </button>
+                <div class="flex space-x-2">
+                    <button onclick="editNote(${note.id})" class="text-gray-400 hover:text-white text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                    </button>
+                    <button onclick="deleteNote(${note.id})" class="text-red-400 hover:text-red-300 text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-gray-300 text-sm">${note.content}</p>
+        </div>
+    `).join('');
+}
+
+// Mostrar comentarios en el panel
+function displayComments(comments) {
+    const commentsList = document.getElementById('comments-list');
+    if (!commentsList) return;
+    
+    if (comments.length === 0) {
+        commentsList.innerHTML = '<p class="text-gray-500 text-center py-4">No hay comentarios para esta lección</p>';
+        return;
+    }
+    
+    commentsList.innerHTML = comments.map(comment => `
+        <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                    ${comment.timestamp ? `
+                        <button onclick="jumpToTime(${comment.timestamp})" 
+                                class="text-blue-400 hover:text-blue-300 text-sm font-mono">
+                            ${formatDuration(comment.timestamp)}
+                        </button>
+                    ` : ''}
+                    <span class="text-gray-500 text-xs">${new Date(comment.created_at).toLocaleDateString()}</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editComment(${comment.id})" class="text-gray-400 hover:text-white text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                    </button>
+                    <button onclick="deleteComment(${comment.id})" class="text-red-400 hover:text-red-300 text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-gray-300 text-sm">${comment.content}</p>
+        </div>
+    `).join('');
+}
+
+// Función para saltar a un tiempo específico en el video
+function jumpToTime(timestamp) {
+    const video = document.getElementById('lesson-video');
+    if (video) {
+        video.currentTime = timestamp;
+        video.focus();
+    }
+}
+
+// Función auxiliar para formatear duración
+function formatDuration(seconds) {
+    if (seconds === 0) return '0:00';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 </script>

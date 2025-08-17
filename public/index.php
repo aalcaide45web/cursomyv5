@@ -328,5 +328,130 @@ $router->get('/api/lessons/{id}', function($id) {
     }
 });
 
+// Cargar controlador del player
+require_once __DIR__ . '/../app/Controllers/PlayerController.php';
+
+// Rutas para notas
+$router->get('/api/lessons/{id}/notes', function($id) {
+    $controller = new PlayerController();
+    $result = $controller->getNotes((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Notas obtenidas correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->post('/api/lessons/{id}/notes', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $timestamp = $input['timestamp'] ?? 0;
+    $content = $input['content'] ?? '';
+    
+    $controller = new PlayerController();
+    $result = $controller->createNote((int) $id, (int) $timestamp, $content);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->put('/api/notes/{id}', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $timestamp = $input['timestamp'] ?? 0;
+    $content = $input['content'] ?? '';
+    
+    $controller = new PlayerController();
+    $result = $controller->updateNote((int) $id, (int) $timestamp, $content);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->delete('/api/notes/{id}', function($id) {
+    $controller = new PlayerController();
+    $result = $controller->deleteNote((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+// Rutas para comentarios
+$router->get('/api/lessons/{id}/comments', function($id) {
+    $controller = new PlayerController();
+    $result = $controller->getComments((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok($result['data'], 'Comentarios obtenidos correctamente');
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->post('/api/lessons/{id}/comments', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $content = $input['content'] ?? '';
+    $timestamp = $input['timestamp'] ?? null;
+    
+    $controller = new PlayerController();
+    $result = $controller->createComment((int) $id, $content, $timestamp);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->put('/api/comments/{id}', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $content = $input['content'] ?? '';
+    $timestamp = $input['timestamp'] ?? null;
+    
+    $controller = new PlayerController();
+    $result = $controller->updateComment((int) $id, $content, $timestamp);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+$router->delete('/api/comments/{id}', function($id) {
+    $controller = new PlayerController();
+    $result = $controller->deleteComment((int) $id);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
+// Ruta para actualizar progreso
+$router->post('/api/lessons/{id}/progress', function($id) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $position = $input['position'] ?? 0;
+    $duration = $input['duration'] ?? 0;
+    
+    $controller = new PlayerController();
+    $result = $controller->updateProgress((int) $id, (int) $position, (int) $duration);
+    
+    if ($result['success']) {
+        JsonResponse::ok(null, $result['message']);
+    } else {
+        JsonResponse::badRequest($result['error']);
+    }
+});
+
 // Ejecutar router
 $router->run();
