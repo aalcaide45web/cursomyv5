@@ -453,6 +453,9 @@ $router->post('/api/lessons/{id}/progress', function($id) {
     }
 });
 
+// Cargar controlador de valoraciones
+require_once __DIR__ . '/../app/Controllers/RatingController.php';
+
 // Rutas para valoraciones
 $router->get('/api/courses/{id}/rating', function($id) {
     $controller = new RatingController();
@@ -537,6 +540,14 @@ $router->get('/api/ratings/search', function() {
         JsonResponse::badRequest($result['error']);
     }
 });
+
+// Cargar controlador de búsqueda y componentes
+require_once __DIR__ . '/../app/Controllers/SearchController.php';
+require_once __DIR__ . '/../app/Services/Search/SearchService.php';
+require_once __DIR__ . '/../app/Views/components/SearchBox.php';
+require_once __DIR__ . '/../app/Views/components/StarRating.php';
+require_once __DIR__ . '/../app/Views/components/CourseCard.php';
+require_once __DIR__ . '/../app/Views/components/VideoPlayer.php';
 
 // Rutas para búsqueda global
 $router->get('/api/search', function() {
